@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Bar Manager</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="description" content="Gérez votre cave à cocktails et découvrez des recettes selon vos alcools disponibles.">
+
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Bar Manager">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/icon-512.png">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<header>
+  <h1>🍸 Bar Manager</h1>
+  <nav>
+    <button class="tab-btn active" data-tab="stock">Stock</button>
+    <button class="tab-btn" data-tab="cocktails">Cocktails</button>
+    <button class="tab-btn" data-tab="degustation">Dégustation</button>
+    <button class="tab-btn" data-tab="recherche">Recherche</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ONGLET STOCK -->
+  <section id="stock" class="tab active">
+    <div class="section-header">
+      <h2>Ma cave</h2>
+      <div class="filters">
+        <input type="text" id="stockSearch" placeholder="🔍 Rechercher un alcool...">
+        <select id="stockFilter">
+          <option value="all">Toutes catégories</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="storage-zone">
+      <h3>❄️ Réfrigérateur</h3>
+      <div id="fridgeList" class="alcohol-grid"></div>
+    </div>
+    <div class="storage-zone">
+      <h3>🌡️ Température ambiante</h3>
+      <div id="ambientList" class="alcohol-grid"></div>
+    </div>
+  </section>
+
+  <!-- ONGLET COCKTAILS -->
+  <section id="cocktails" class="tab">
+    <div class="section-header">
+      <h2>Recettes de cocktails</h2>
+      <input type="text" id="cocktailSearch" placeholder="🔍 Rechercher un cocktail...">
+    </div>
+    <div class="filter-info" id="filterInfo"></div>
+    <div id="cocktailList" class="cocktail-grid"></div>
+  </section>
+
+  <!-- ONGLET DÉGUSTATION -->
+  <section id="degustation" class="tab">
+    <div class="section-header">
+      <h2>Alcools de dégustation pure</h2>
+      <p class="subtitle">À apprécier seuls, sans mélange</p>
+    </div>
+    <div id="degustationList" class="alcohol-grid"></div>
+  </section>
+
+  <!-- ONGLET RECHERCHE -->
+  <section id="recherche" class="tab">
+    <div class="section-header">
+      <h2>Recherche & Découverte</h2>
+      <input type="text" id="globalSearch" placeholder="🔍 Chercher un alcool, un cocktail, un ingrédient...">
+    </div>
+    <div id="anecdoteBox" class="anecdote">
+      <h3>💡 Anecdote du jour</h3>
+      <p id="anecdoteText"></p>
+      <button id="nextAnecdote">Autre anecdote →</button>
+    </div>
+    <div id="searchResults"></div>
+  </section>
+</main>
+
+<!-- Bouton install PWA -->
+<button id="installBtn" class="install-btn" style="display:none;">📥 Installer l'app</button>
+
+<!-- MODAL DÉTAIL ALCOOL -->
+<div id="alcoholModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 id="modalTitle"></h2>
+    <p id="modalDescription"></p>
+    <div class="stock-manager">
+      <h3>Stock</h3>
+      <div class="stock-controls">
+        <button class="stock-btn" data-action="dec">−</button>
+        <span id="modalStock">0</span>
+        <button class="stock-btn" data-action="inc">+</button>
+        <span class="unit">bouteille(s)</span>
+      </div>
+    </div>
+    <div id="modalRecipes">
+      <h3>🍹 Cocktails possibles</h3>
+      <div id="recipeList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts app -->
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+
+<!-- PWA: Service Worker + prompt d'installation -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      // Chemin relatif → compatible GitHub Pages (sous-dossier)
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('✅ SW enregistré:', reg.scope))
+        .catch(err => console.error('❌ Erreur SW:', err));
+    });
+  }
+
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+  });
+</script>
+
+</body>
+</html>

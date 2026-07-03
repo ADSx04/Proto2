@@ -1,5 +1,5 @@
 // ====== Service Worker – Bar Manager ======
-const CACHE_VERSION = "v1.1.0";
+const CACHE_VERSION = "v1.2.0";
 const CACHE_NAME = `bar-manager-${CACHE_VERSION}`;
 
 // Chemins relatifs → compatibles GitHub Pages

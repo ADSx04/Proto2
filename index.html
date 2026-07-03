@@ -5,22 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Bar Manager</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#1a1a2e">
-  <meta name="description" content="Gérez votre cave à cocktails et découvrez des recettes selon vos alcools disponibles.">
 
-  <!-- iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Bar Manager">
   <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
-
-  <!-- Favicon -->
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/icons/icon-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="./assets/icons/icon-512.png">
 
-  <!-- Styles -->
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -28,63 +22,76 @@
 <header>
   <h1>🍸 Bar Manager</h1>
   <nav>
-    <button class="tab-btn active" data-tab="stock">Stock</button>
-    <button class="tab-btn" data-tab="cocktails">Cocktails</button>
-    <button class="tab-btn" data-tab="degustation">Dégustation</button>
+    <button class="tab-btn active" data-tab="stock">Ma cave</button>
+    <button class="tab-btn" data-tab="beers">Bières</button>
+    <button class="tab-btn" data-tab="cocktails">Recettes</button>
     <button class="tab-btn" data-tab="recherche">Recherche</button>
   </nav>
 </header>
 
 <main>
-  <!-- ONGLET STOCK -->
+  <!-- ONGLET MA CAVE -->
   <section id="stock" class="tab active">
     <div class="section-header">
       <h2>Ma cave</h2>
-      <div class="filters">
-        <input type="text" id="stockSearch" placeholder="🔍 Rechercher un alcool...">
-        <select id="stockFilter">
-          <option value="all">Toutes catégories</option>
-        </select>
-      </div>
+      <button id="addAlcoholBtn" class="primary-btn">+ Ajouter un alcool</button>
+    </div>
+    <p class="subtitle">Ajoutez vos alcools au fur et à mesure. Cliquez sur une carte pour gérer le stock.</p>
+
+    <div id="emptyCave" class="empty-state" style="display:none;">
+      <p>🍾 Votre cave est vide</p>
+      <p class="subtitle">Cliquez sur "+ Ajouter un alcool" pour commencer.</p>
     </div>
 
-    <div class="storage-zone">
+    <div class="storage-zone" id="fridgeZone" style="display:none;">
       <h3>❄️ Réfrigérateur</h3>
       <div id="fridgeList" class="alcohol-grid"></div>
     </div>
-    <div class="storage-zone">
+    <div class="storage-zone" id="ambientZone" style="display:none;">
       <h3>🌡️ Température ambiante</h3>
       <div id="ambientList" class="alcohol-grid"></div>
     </div>
   </section>
 
-  <!-- ONGLET COCKTAILS -->
-  <section id="cocktails" class="tab">
+  <!-- ONGLET BIÈRES -->
+  <section id="beers" class="tab">
     <div class="section-header">
-      <h2>Recettes de cocktails</h2>
-      <input type="text" id="cocktailSearch" placeholder="🔍 Rechercher un cocktail...">
+      <h2>Stock de bières</h2>
+      <button id="addBeerBtn" class="primary-btn">+ Ajouter une bière</button>
     </div>
-    <div class="filter-info" id="filterInfo"></div>
-    <div id="cocktailList" class="cocktail-grid"></div>
+    <p class="subtitle">Gérez vos bières par marque, comptées en bouteilles.</p>
+
+    <div id="emptyBeers" class="empty-state" style="display:none;">
+      <p>🍺 Aucune bière enregistrée</p>
+      <p class="subtitle">Cliquez sur "+ Ajouter une bière" pour commencer.</p>
+    </div>
+
+    <div id="beerList" class="alcohol-grid"></div>
   </section>
 
-  <!-- ONGLET DÉGUSTATION -->
-  <section id="degustation" class="tab">
+  <!-- ONGLET RECETTES -->
+  <section id="cocktails" class="tab">
     <div class="section-header">
-      <h2>Alcools de dégustation pure</h2>
-      <p class="subtitle">À apprécier seuls, sans mélange</p>
+      <h2>Recettes</h2>
+      <input type="text" id="cocktailSearch" placeholder="🔍 Rechercher...">
     </div>
-    <div id="degustationList" class="alcohol-grid"></div>
+    <div class="cat-tabs">
+      <button class="cat-btn active" data-cat="all">Toutes</button>
+      <button class="cat-btn" data-cat="classic">🍸 Classiques</button>
+      <button class="cat-btn" data-cat="punch">🍹 Punchs</button>
+      <button class="cat-btn" data-cat="shot">🥃 Shots / Flash</button>
+    </div>
+    <div id="cocktailList" class="cocktail-grid"></div>
   </section>
 
   <!-- ONGLET RECHERCHE -->
   <section id="recherche" class="tab">
     <div class="section-header">
       <h2>Recherche & Découverte</h2>
-      <input type="text" id="globalSearch" placeholder="🔍 Chercher un alcool, un cocktail, un ingrédient...">
+      <input type="text" id="globalSearch" placeholder="🔍 Chercher un alcool, un cocktail...">
     </div>
     <div id="anecdoteBox" class="anecdote">
-      <h3>💡 Anecdote du jour</h3>
+      <h3>💡 Anecdote</h3>
       <p id="anecdoteText"></p>
       <button id="nextAnecdote">Autre anecdote →</button>
     </div>
@@ -92,55 +99,124 @@
   </section>
 </main>
 
-<!-- Bouton install PWA -->
 <button id="installBtn" class="install-btn" style="display:none;">📥 Installer l'app</button>
 
 <!-- MODAL DÉTAIL ALCOOL -->
 <div id="alcoholModal" class="modal">
   <div class="modal-content">
-    <span class="close">&times;</span>
+    <span class="close" data-close="alcoholModal">&times;</span>
     <h2 id="modalTitle"></h2>
-    <p id="modalDescription"></p>
+    <p id="modalDescription" class="subtitle"></p>
     <div class="stock-manager">
       <h3>Stock</h3>
       <div class="stock-controls">
         <button class="stock-btn" data-action="dec">−</button>
         <span id="modalStock">0</span>
         <button class="stock-btn" data-action="inc">+</button>
-        <span class="unit">bouteille(s)</span>
+        <span class="unit" id="modalUnit">bouteille(s)</span>
       </div>
     </div>
     <div id="modalRecipes">
-      <h3>🍹 Cocktails possibles</h3>
+      <h3>🍹 Recettes possibles</h3>
       <div id="recipeList"></div>
     </div>
+    <button id="deleteAlcoholBtn" class="danger-btn">🗑️ Retirer de ma cave</button>
   </div>
 </div>
 
-<!-- Scripts app -->
+<!-- MODAL AJOUT ALCOOL -->
+<div id="addModal" class="modal">
+  <div class="modal-content">
+    <span class="close" data-close="addModal">&times;</span>
+    <h2>Ajouter un alcool</h2>
+
+    <div class="form-group">
+      <label>Choisir dans le catalogue</label>
+      <select id="catalogSelect">
+        <option value="">— Choisir un alcool —</option>
+      </select>
+    </div>
+
+    <div class="divider">ou créer un alcool personnalisé</div>
+
+    <div class="form-group">
+      <label>Nom</label>
+      <input type="text" id="customName" placeholder="Ex: Rhum arrangé maison">
+    </div>
+    <div class="form-group">
+      <label>Catégorie</label>
+      <input type="text" id="customCategory" placeholder="Ex: Rhum, Liqueur...">
+    </div>
+    <div class="form-group">
+      <label>Conservation</label>
+      <select id="customStorage">
+        <option value="ambient">🌡️ Température ambiante</option>
+        <option value="fridge">❄️ Réfrigérateur</option>
+      </select>
+    </div>
+
+    <button id="confirmAddBtn" class="primary-btn full">Ajouter à ma cave</button>
+  </div>
+</div>
+
+<!-- MODAL AJOUT BIÈRE -->
+<div id="addBeerModal" class="modal">
+  <div class="modal-content">
+    <span class="close" data-close="addBeerModal">&times;</span>
+    <h2>Ajouter une bière</h2>
+    <div class="form-group">
+      <label>Marque / Nom</label>
+      <input type="text" id="beerName" placeholder="Ex: Heineken, Leffe, 1664...">
+    </div>
+    <div class="form-group">
+      <label>Type (optionnel)</label>
+      <input type="text" id="beerType" placeholder="Ex: Blonde, IPA, Stout...">
+    </div>
+    <div class="form-group">
+      <label>Nombre de bouteilles</label>
+      <input type="number" id="beerQty" min="0" value="6">
+    </div>
+    <button id="confirmAddBeerBtn" class="primary-btn full">Ajouter</button>
+  </div>
+</div>
+
+<!-- MODAL DÉTAIL BIÈRE -->
+<div id="beerModal" class="modal">
+  <div class="modal-content">
+    <span class="close" data-close="beerModal">&times;</span>
+    <h2 id="beerModalTitle"></h2>
+    <p id="beerModalType" class="subtitle"></p>
+    <div class="stock-manager">
+      <h3>Stock</h3>
+      <div class="stock-controls">
+        <button class="stock-btn" data-action="beer-dec">−</button>
+        <span id="beerModalStock">0</span>
+        <button class="stock-btn" data-action="beer-inc">+</button>
+        <span class="unit">bouteille(s)</span>
+      </div>
+    </div>
+    <button id="deleteBeerBtn" class="danger-btn">🗑️ Retirer</button>
+  </div>
+</div>
+
 <script src="./data.js"></script>
 <script src="./app.js"></script>
 
-<!-- PWA: Service Worker + prompt d'installation -->
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      // Chemin relatif → compatible GitHub Pages (sous-dossier)
       navigator.serviceWorker.register('./sw.js')
         .then(reg => console.log('✅ SW enregistré:', reg.scope))
         .catch(err => console.error('❌ Erreur SW:', err));
     });
   }
-
   let deferredPrompt;
   const installBtn = document.getElementById('installBtn');
-
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     installBtn.style.display = 'block';
   });
-
   installBtn.addEventListener('click', async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
@@ -148,10 +224,7 @@
     deferredPrompt = null;
     installBtn.style.display = 'none';
   });
-
-  window.addEventListener('appinstalled', () => {
-    installBtn.style.display = 'none';
-  });
+  window.addEventListener('appinstalled', () => installBtn.style.display = 'none');
 </script>
 
 </body>
